@@ -11,6 +11,8 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
@@ -49,14 +51,33 @@ public class TowerInstallation extends AbstractDescribableImpl<TowerInstallation
         this.enableDebugging = enableDebugging;
     }
 
-    public String getTowerDisplayName() { return this.towerDisplayName; }
-    public String getTowerURL() { return this.towerURL; }
-    public String getTowerCredentialsId() { return this.towerCredentialsId; }
-    public boolean getTowerTrustCert() { return this.towerTrustCert; }
-    public boolean getEnableDebugging() { return this.enableDebugging; }
+    public String getTowerDisplayName() {
+        return this.towerDisplayName;
+    }
 
-    public void setTowerCredentialsId(String towerCredentialsId) { this.towerCredentialsId = towerCredentialsId; }
-    public void setRun(Run run) { this.run = run; }
+    public String getTowerURL() {
+        return this.towerURL;
+    }
+
+    public String getTowerCredentialsId() {
+        return this.towerCredentialsId;
+    }
+
+    public boolean getTowerTrustCert() {
+        return this.towerTrustCert;
+    }
+
+    public boolean getEnableDebugging() {
+        return this.enableDebugging;
+    }
+
+    public void setTowerCredentialsId(String towerCredentialsId) {
+        this.towerCredentialsId = towerCredentialsId;
+    }
+
+    public void setRun(Run run) {
+        this.run = run;
+    }
 
     public TowerConnector getTowerConnector() {
         return TowerInstallation.getTowerConnectorStatic(this.towerURL, this.towerCredentialsId, this.towerTrustCert,
@@ -86,17 +107,14 @@ public class TowerInstallation extends AbstractDescribableImpl<TowerInstallation
         TowerConnector testConnector = new TowerConnector(towerURL, username, password, oauth_token, trustCert, enableDebugging);
         return testConnector;
     }
-
+    
+    @SuppressFBWarnings("DCN_NULLPOINTER_EXCEPTION")
     private static <C extends Credentials> List<C> getCredsList(Class<C> type, Run run) {
         List<C> credsList;
 
-        if (run != null) {
-            try {
-                credsList = CredentialsProvider.lookupCredentials(type,
-                        run.getParent(), null, new DomainRequirement());
-            } catch (NullPointerException e) {
-                credsList = CredentialsProvider.lookupCredentials(type);
-            }
+        if (run != null && run.getParent() != null) {
+            credsList = CredentialsProvider.lookupCredentials(type,
+                    run.getParent(), null, new DomainRequirement());
         } else {
             credsList = CredentialsProvider.lookupCredentials(type);
         }
